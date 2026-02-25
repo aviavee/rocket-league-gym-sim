@@ -1,5 +1,5 @@
 import numpy as np
-import gym.spaces
+from rlgym_sim.utils.compat import spaces
 from rlgym_sim.utils.gamestates import GameState
 from rlgym_sim.utils.action_parsers import ContinuousAction
 from typing import Union, List
@@ -14,7 +14,7 @@ class DefaultAction(ContinuousAction):
     def __init__(self):
         super().__init__()
 
-    def get_action_space(self) -> gym.spaces.Space:
+    def get_action_space(self) -> spaces.Space:
         return super().get_action_space()
 
     def parse_actions(self, actions: Union[np.ndarray, List[np.ndarray], List[float]], state: GameState) -> np.ndarray:

@@ -1,33 +1,118 @@
 # rocket-league-gym-sim
-A version of [RLGym](https://www.rlgym.org) for use with the [RocketSim](https://github.com/ZealanL/RocketSim) simulator.
 
-## FOREWORD
-This project is a TEMPORARY STOP-GAP to use RocketSim while RLGym 2.0 is in development. I provide no guarantees that it is bug-free or that I will not make breaking changes to this project in the future.
+**v2.0.0** — A version of [RLGym](https://www.rlgym.org) for use with the [RocketSim](https://github.com/ZealanL/RocketSim) simulator.
 
-This project requires you to acquire assets from a copy of Rocket League that you own with an asset dumper. I will not walk you through this process. The necessary links and basic instructions are listed below. If you cannot follow those, don't bother me.
+Supports both the classic CPU-based C++ RocketSim backend and a new JAX GPU-accelerated backend, and is compatible with both the modern `gymnasium` API and the legacy `gym` API.
 
-## INSTALLATION
-1. Install RocketSim via `pip install rocketsim` 
-2. Install this project with pip via `pip install git+https://github.com/AechPro/rocket-league-gym-sim@main`
-3. Build and run the [asset dumper](https://github.com/ZealanL/RLArenaCollisionDumper)
-4. Move the dumped assets to the top level of your project directory
+---
 
-## USAGE
-This project acts as a drop-in replacement for RLGym and can be used in exactly the same way. Barring the changed variables listed below, you can replace every instance of `rlgym` with `rlgym_sim` (or simply `import rlgym_sim as rlgym`) and your existing RLGym code should work. 
+## Requirements
 
-All variables having to do with the game client have been removed from the `make` function. For example, `rlgym_sim.make(use_injector=True)` will fail because there is no injector. The following is a list of all removed `make` variables:
-- `use_injector`
-- `game_speed`
-- `auto_minimize`
-- `force_paging`
-- `launch_preference`
-- `raise_on_crash`
-- `self_play`
+- Python ≥ 3.12
+- numpy ≥ 2.0
+- `gymnasium ≥ 1.0` (recommended) **or** `gym ≥ 0.17` (legacy)
 
-Thanks to the flexibility of the simulator, the following additional variables have been added as arguments to `make`:
-- `copy_gamestate_every_step`: Leave this alone for the default behavior. Setting this to `True` will no longer return a new `GameState` object at every call to `step`, which is substantially faster. However, if you need to track data from the game state or its member variables over time, you will need to manually copy all relevant `GameState`, `PlayerData`, and `PhysicsObject` data at each `step`.
-- `dodge_deadzone`: Sets the threshold value that `pitch` must meet in order for a dodge to occur when jumping in the air.
+Collision mesh assets from a copy of Rocket League you own are required for the simulator.  
+Use the [RLArenaCollisionDumper](https://github.com/ZealanL/RLArenaCollisionDumper) to extract them and place the output folder at the top level of your project directory (`./collision_meshes/`).
 
-## KNOWN ISSUES
-- A variety of classes in `rlgym_utils` such as `SB3MultipleInstanceEnv` imports the `rlgym` library to build environments, so you will need to replace those imports yourself and remove the misc launch options listed above if you want to use SB3 with `rlgym_sim`. Note also that `SB3MultipleInstanceEnv` waits 60 seconds between launching clients by default because multiple Rocket League clients will break each other if launched simultaneously. This is not the case with RocketSim, so you can remove that delay.
-- the `PlayerData` objects do not track `match_saves` or `match_shots` yet.
+---
+
+## Installation
+
+### Legacy backend (CPU, C++ RocketSim)
+```bash
+pip install "rlgym-sim[legacy]"
+# or manually:
+pip install rocketsim gymnasium
+pip install git+https://github.com/AechPro/rocket-league-gym-sim@main
+```
+
+### JAX GPU backend
+```bash
+pip install "rlgym-sim[jax]"
+```
+
+### Core only (no simulator backend)
+```bash
+pip install "rlgym-sim[gymnasium]"
+```
+
+---
+
+## Usage
+
+`rlgym_sim` is a drop-in replacement for RLGym.  You can replace every `rlgym` import with `rlgym_sim` (or `import rlgym_sim as rlgym`) and existing code will work.
+
+```python
+import rlgym_sim
+
+env = rlgym_sim.make(tick_skip=8, spawn_opponents=True)
+
+obs, info = env.reset()          # gymnasium returns (obs, info)
+done = False
+while not done:
+    actions = env.action_space.sample()
+    obs, reward, terminated, truncated, info = env.step(actions)
+    done = terminated or truncated
+```
+
+### gymnasium vs gym API
+
+The step/reset signatures automatically adapt to whichever package is installed:
+
+| Package | `reset()` | `step()` |
+|---------|-----------|----------|
+| `gymnasium` | `(obs, info)` | `(obs, reward, terminated, truncated, info)` |
+| `gym` (legacy) | `obs` | `(obs, reward, done, info)` |
+
+If both are installed, `gymnasium` takes priority.
+
+### Selecting a backend
+
+Pass `backend=` to `make()`:
+
+```python
+# Default — C++ RocketSim (CPU)
+env = rlgym_sim.make(backend="legacy")
+
+# JAX GPU backend (requires rlgym-sim[jax])
+env = rlgym_sim.make(backend="jax", n_envs=1024)
+```
+
+### `make()` parameters
+
+| Parameter | Default | Description |
+|-----------|---------|-------------|
+| `tick_skip` | `8` | Physics ticks per `step()` call |
+| `spawn_opponents` | `False` | Include orange-team cars |
+| `team_size` | `1` | Cars per team |
+| `gravity` | `1.0` | Gravity scalar |
+| `boost_consumption` | `1.0` | Boost drain rate scalar |
+| `copy_gamestate_every_step` | `True` | Return a fresh `GameState` each step (slower but safe for cross-step comparisons) |
+| `dodge_deadzone` | `0.8` | Min pitch magnitude required to trigger a dodge |
+| `backend` | `"legacy"` | `"legacy"` (C++ RocketSim) or `"jax"` (JAX GPU) |
+| `**backend_kw` | — | Extra kwargs forwarded to the backend (e.g. `n_envs=1024` for JAX) |
+
+Client-specific options from the original RLGym (`use_injector`, `game_speed`, `auto_minimize`, etc.) are not applicable and have been removed.
+
+---
+
+## What's new in v2.0.0
+
+- **gymnasium / gym compat shim** — auto-detects the installed package; step and reset signatures adapt accordingly.
+- **Pluggable simulator backends** — abstract `SimBackend` interface with two implementations:
+  - `LegacyBackend` — original C++ RocketSim (ZealanL / mtheall bindings, `pip install rocketsim`)
+  - `JaxBackend` — GPU-accelerated JAX backend (BLMChoosen/RocketSim fork)
+- **Lazy imports** — `import rlgym_sim` no longer hard-fails if `RocketSim` is not installed; the backend is only loaded when `make()` is called.
+- **numpy ≥ 2.0** — updated throughout; dtype handling follows the numpy 2 spec.
+- **Python ≥ 3.12** required.
+- **Docker support** — `Dockerfile` (test image) and `Dockerfile.dev` (full training stack with RocketSim + PyTorch + SB3).
+- **`__version__`** exposed via `rlgym_sim.__version__`.
+
+---
+
+## Known issues
+
+- `PlayerData` does not yet track `match_saves` or `match_shots`.
+- `SB3MultipleInstanceEnv` (from `rlgym_utils`) imports the `rlgym` library directly; replace those imports with `rlgym_sim` equivalents and remove the 60-second inter-launch delay (not needed with RocketSim).
+- JAX backend mutator settings (gravity, boost consumption) are not yet wired through to the JAX RocketSim constants layer.

@@ -1,5 +1,5 @@
 import numpy as np
-import gym.spaces
+from rlgym_sim.utils.compat import spaces
 from rlgym_sim.utils.gamestates import GameState
 from rlgym_sim.utils.action_parsers import ActionParser
 
@@ -14,8 +14,8 @@ class DiscreteAction(ActionParser):
         assert n_bins % 2 == 1, "n_bins must be an odd number"
         self._n_bins = n_bins
 
-    def get_action_space(self) -> gym.spaces.Space:
-        return gym.spaces.MultiDiscrete([self._n_bins] * 5 + [2] * 3)
+    def get_action_space(self) -> spaces.Space:
+        return spaces.MultiDiscrete([self._n_bins] * 5 + [2] * 3)
 
     def parse_actions(self, actions: np.ndarray, state: GameState) -> np.ndarray:
         actions = actions.reshape((-1, 8)).astype(dtype=np.float32)

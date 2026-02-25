@@ -1,10 +1,10 @@
 from setuptools import setup, find_packages
 
-__version__ = "1.2.6"
+__version__ = "2.0.0"
 
 with open('README.md', 'r') as readme_file:
     long_description = readme_file.read()
-    
+
 setup(
     name='rlgym-sim',
     packages=find_packages(),
@@ -15,11 +15,34 @@ setup(
     author='Lucas Emery, Matthew Allen, Zealan, and Mtheall',
     url='https://github.com/AechPro/rocket-league-gym-sim',
     install_requires=[
-        'gym>=0.17',
-        'numpy>=1.19, <2.0',
+        'numpy>=2.0',
     ],
-    python_requires='>=3.7',
+    extras_require={
+        'gym': ['gym>=0.17'],
+        'gymnasium': ['gymnasium>=1.0'],
+        'legacy': ['rocketsim>=2.2.0', 'gym>=0.17'],   # ZealanL/RocketSim (mtheall bindings)
+        'jax': [
+            'jax[cuda12]',
+            'flax',
+            'chex',
+        ],
+        'all': [
+            'gymnasium>=1.0',
+            'gym>=0.17',
+            'rocketsim>=2.2.0',
+            'jax[cuda12]',
+            'flax',
+            'chex',
+        ],
+    },
+    python_requires='>=3.12',
     license='Apache 2.0',
     license_file='LICENSE',
-    keywords=['rocket-league', 'gym', 'reinforcement-learning', 'simulation']
+    keywords=['rocket-league', 'gym', 'reinforcement-learning', 'simulation'],
+    classifiers=[
+        'Programming Language :: Python :: 3.12',
+        'Programming Language :: Python :: 3.13',
+        'License :: OSI Approved :: Apache Software License',
+        'Operating System :: OS Independent',
+    ],
 )

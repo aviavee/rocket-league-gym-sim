@@ -1,6 +1,6 @@
 import math
 import numpy as np
-import gym.spaces
+from rlgym_sim.utils.compat import spaces
 from rlgym_sim.utils import common_values
 from rlgym_sim.utils.gamestates import GameState
 from rlgym_sim.utils.action_parsers import ActionParser
@@ -15,9 +15,8 @@ class ContinuousAction(ActionParser):
     def __init__(self):
         super().__init__()
 
-    def get_action_space(self) -> gym.spaces.Space:
-        # return gym.spaces.Tuple((gym.spaces.Box(-1, 1, shape=(5,)), gym.spaces.MultiBinary(3)))
-        return gym.spaces.Box(-1, 1, shape=(common_values.NUM_ACTIONS,))
+    def get_action_space(self) -> spaces.Space:
+        return spaces.Box(-1, 1, shape=(common_values.NUM_ACTIONS,))
 
     def parse_actions(self, actions: np.ndarray, state: GameState) -> np.ndarray:
         actions = actions.reshape((-1, 8))

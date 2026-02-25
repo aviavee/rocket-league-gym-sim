@@ -4,7 +4,7 @@ The action parser.
 
 from abc import ABC, abstractmethod
 from rlgym_sim.utils.gamestates import PlayerData, GameState
-import gym.spaces
+from rlgym_sim.utils.compat import spaces
 import numpy as np
 from typing import List, Union, Tuple, Dict, Any
 
@@ -15,7 +15,7 @@ class ActionParser(ABC):
         pass
 
     @abstractmethod
-    def get_action_space(self) -> gym.spaces.Space:
+    def get_action_space(self) -> spaces.Space:
         """
         Function that returns the action space type. It will be called during the initialization of the environment.
         

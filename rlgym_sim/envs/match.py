@@ -5,7 +5,7 @@ The Match object.
 from rlgym_sim.envs.environment import Environment
 from rlgym_sim.utils.gamestates import GameState
 from rlgym_sim.utils import common_values
-import gym.spaces
+from rlgym_sim.utils.compat import spaces
 import numpy as np
 from typing import List, Union, Any
 
@@ -147,4 +147,4 @@ class Match(Environment):
             self._obs_builder.pre_step(empty_game_state)
             obs_shape = np.shape(self._obs_builder.build_obs(empty_player_packets[0], empty_game_state, prev_inputs))
 
-            self.observation_space = gym.spaces.Box(-np.inf, np.inf, shape=obs_shape)
+            self.observation_space = spaces.Box(-np.inf, np.inf, shape=obs_shape)

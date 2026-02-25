@@ -1,0 +1,29 @@
+# Ignore VCS, IDE, OS and build artefacts to keep Docker context small
+.git
+.github
+__pycache__
+*.pyc
+*.pyo
+*.egg-info
+dist/
+build/
+.eggs/
+.tox/
+.venv/
+venv/
+env/
+node_modules/
+
+# Editor / IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Docker-in-Docker
+Dockerfile
+docker-compose*.yml
+.dockerignore
+
+# Docs / update notes (not needed at runtime)
+update/

@@ -135,3 +135,7 @@ assets.path
 /assets
 umodel
 settings.txt
+update
+tests
+.github
+_temp/
