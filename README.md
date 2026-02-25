@@ -1,6 +1,6 @@
-# rocket-league-gym-sim
+# rocket-league-gym-sim WORK IN PROGRESS
 
-**v2.0.0** — A version of [RLGym](https://www.rlgym.org) for use with the [RocketSim](https://github.com/ZealanL/RocketSim) simulator.
+**vX.0.0** — A version of [RLGym](https://www.rlgym.org) for use with the [RocketSim](https://github.com/ZealanL/RocketSim) simulator.
 
 Supports both the classic CPU-based C++ RocketSim backend and a new JAX GPU-accelerated backend, and is compatible with both the modern `gymnasium` API and the legacy `gym` API.
 
@@ -116,3 +116,4 @@ Client-specific options from the original RLGym (`use_injector`, `game_speed`, `
 - `PlayerData` does not yet track `match_saves` or `match_shots`.
 - `SB3MultipleInstanceEnv` (from `rlgym_utils`) imports the `rlgym` library directly; replace those imports with `rlgym_sim` equivalents and remove the 60-second inter-launch delay (not needed with RocketSim).
 - JAX backend mutator settings (gravity, boost consumption) are not yet wired through to the JAX RocketSim constants layer.
+
