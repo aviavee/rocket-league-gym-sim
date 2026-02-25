@@ -24,7 +24,7 @@ Use the [RLArenaCollisionDumper](https://github.com/ZealanL/RLArenaCollisionDump
 pip install "rlgym-sim[legacy]"
 # or manually:
 pip install rocketsim gymnasium
-pip install git+https://github.com/AechPro/rocket-league-gym-sim@main
+pip install git+https://github.com/aviavee/rocket-league-gym-sim@main
 ```
 
 ### JAX GPU backend
